@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using QuantConnect.Securities.Forex;
 
 namespace TradingDaysFileChecker
 {
-    class FileHandler
+    public class FileHandler
     {
 
         private StreamWriter _writeToFile;
@@ -23,7 +26,7 @@ namespace TradingDaysFileChecker
             _endDate = new DateTime(2016, 07, 25);
             _exchange = exchange;
 
-            _writeToFile = new System.IO.StreamWriter(@"C:\Users\RichardsPC\Documents");
+            _writeToFile = new StreamWriter(@"C:\Users\RichardsPC\Documents");
             _dataFilePath = @"C:\Users\RichardsPC\Desktop\export\exporter\forex\fxcm\minute\";
             _forexSecuritiesFolders = Directory.GetDirectories(_dataFilePath);
 
