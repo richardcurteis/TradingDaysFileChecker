@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using QuantConnect;
-using QuantConnect.Securities;
-using QuantConnect.Securities.Forex;
 
 namespace TradingDaysFileChecker
 {
