@@ -1,7 +1,4 @@
-﻿// Needs to reference QuanConnect main solution.
-// In addition, a reference from QuanConnect.Algorithm.References.NodaTime will need to be added.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
