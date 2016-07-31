@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using QuantConnect;
 using QuantConnect.Securities;
 using QuantConnect.Securities.Forex;
@@ -20,7 +17,8 @@ namespace TradingDaysFileChecker
             var marketHoursDbEntry = marketHoursDatabase.GetEntry(symbol.ID.Market, symbol.Value, symbol.ID.SecurityType);
             var exchange = new ForexExchange(marketHoursDbEntry.ExchangeHours);
 
-
+            var checkFiles = new FileHandler(exchange);
+            checkFiles.CheckForMissingFiles();
             Console.ReadLine();
         }
 

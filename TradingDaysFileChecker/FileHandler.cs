@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using QuantConnect.Securities.Forex;
 
 namespace TradingDaysFileChecker
@@ -16,7 +14,7 @@ namespace TradingDaysFileChecker
         private string _dataFilePath;
         private readonly DateTime _startDate;
         private readonly DateTime _endDate;
-        private readonly ForexExchange _exchange;
+        private ForexExchange _exchange;
         private IEnumerable<DateTime> _validTradingDays;
         private string[] _forexSecuritiesFolders;
 
@@ -26,7 +24,7 @@ namespace TradingDaysFileChecker
             _endDate = new DateTime(2016, 07, 25);
             _exchange = exchange;
 
-            _writeToFile = new StreamWriter(@"C:\Users\RichardsPC\Documents");
+            _writeToFile = new StreamWriter(@"C:\Users\RichardsPC\Documents\MissingResults.txt");
             _dataFilePath = @"C:\Users\RichardsPC\Desktop\export\exporter\forex\fxcm\minute\";
             _forexSecuritiesFolders = Directory.GetDirectories(_dataFilePath);
 
@@ -44,18 +42,17 @@ namespace TradingDaysFileChecker
                     var formattedDate = FormatDate(validDay);
                     var path = SetPath(_dataFilePath, fxPair, formattedDate);
 
-                    if (File.Exists(path))
+                    if (!File.Exists(path))
                     {
-                        continue;
+                        _missingDays.Add(Tuple.Create(fxPair, formattedDate));
                     }
-                    _missingDays.Add(Tuple.Create(fxPair, formattedDate));
                 }
             }
 
-            PrintResults();
+            Results();
         }
 
-        public void PrintResults()
+        public void Results()
         {
             if (_missingDays.Count > 0)
             {
@@ -66,7 +63,6 @@ namespace TradingDaysFileChecker
                     WriteResultsToFile(formattedTupleOutput);
                 }
             }
-
             else
             {
                 var noFilesMissing = "No results missing";
@@ -87,7 +83,7 @@ namespace TradingDaysFileChecker
             return tradingDay + "_quote.zip";
         }
 
-        public string FormatDate(DateTime validDay)
+        public static string FormatDate(DateTime validDay)
         {
             return validDay.ToString("yyyyMMdd");
         }
@@ -97,7 +93,7 @@ namespace TradingDaysFileChecker
             return dataFilePath + fxPair + @"\" + FormattedFileName(formattedDate);
         }
 
-        public IEnumerable<DateTime> IterateOverDateRange(ForexExchange exchange, DateTime start, DateTime end)
+        public static IEnumerable<DateTime> IterateOverDateRange(ForexExchange exchange, DateTime start, DateTime end)
         {
             for (var day = start.Date; day.Date <= end.Date; day = day.AddDays(1))
                 if (exchange.IsOpenDuringBar(day.Date, day.Date.AddDays(1), false))
