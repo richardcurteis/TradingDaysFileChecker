@@ -49,11 +49,12 @@ namespace TradingDaysFileChecker
                 }
             }
 
-            Results();
         }
 
-        public void Results()
+        public void GetResults()
         {
+            _writeToFile.AutoFlush = true;
+            _writeToFile.WriteLine($"Total missing files: {_missingDays.Count}");
             if (_missingDays.Count > 0)
             {
                 foreach (var missingDay in _missingDays.OrderBy(md => md.Item1))

@@ -19,6 +19,7 @@ namespace TradingDaysFileChecker
 
             var checkFiles = new FileHandler(exchange);
             checkFiles.CheckForMissingFiles();
+            checkFiles.GetResults();
             Console.ReadLine();
         }
 
