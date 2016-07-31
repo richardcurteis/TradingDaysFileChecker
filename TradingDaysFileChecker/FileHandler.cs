@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using QuantConnect;
 using QuantConnect.Securities.Forex;
 
 namespace TradingDaysFileChecker
@@ -17,6 +19,8 @@ namespace TradingDaysFileChecker
         private ForexExchange _exchange;
         private IEnumerable<DateTime> _validTradingDays;
         private string[] _forexSecuritiesFolders;
+        private Downloader _downloadMissingData;
+
 
         public FileHandler(ForexExchange exchange)
         {
@@ -30,6 +34,9 @@ namespace TradingDaysFileChecker
 
             _missingDays = new List<Tuple<string, string>>();
             _validTradingDays = IterateOverDateRange(_exchange, _startDate, _endDate);
+
+            _downloadMissingData = new Downloader();
+
         }
 
         public void CheckForMissingFiles()
@@ -45,6 +52,9 @@ namespace TradingDaysFileChecker
                     if (!File.Exists(path))
                     {
                         _missingDays.Add(Tuple.Create(fxPair, formattedDate));
+                        var stringDateToDateTime = DateTime.ParseExact(formattedDate, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture);
+                        var symbol = Symbol.Create(fxPair, SecurityType.Forex, Market.FXCM);
+                        _downloadMissingData.Download(symbol, Resolution.Minute, stringDateToDateTime, stringDateToDateTime);
                     }
                 }
             }
@@ -59,15 +69,14 @@ namespace TradingDaysFileChecker
             {
                 foreach (var missingDay in _missingDays.OrderBy(md => md.Item1))
                 {
-                    var formattedTupleOutput = missingDay.ToString().TrimStart('(').TrimEnd(')');
-                    Console.WriteLine(formattedTupleOutput);
+                    var formattedTupleOutput = RemoveSpecialCharacters(missingDay.ToString());
                     WriteResultsToFile(formattedTupleOutput);
+
                 }
             }
             else
             {
                 var noFilesMissing = "No results missing";
-                Console.WriteLine(noFilesMissing);
                 WriteResultsToFile(noFilesMissing);
             }
 
@@ -101,6 +110,19 @@ namespace TradingDaysFileChecker
                 {
                     yield return day;
                 }
+        }
+
+        public static string RemoveSpecialCharacters(string str)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in str)
+            {
+                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString().Insert(6, " ");
         }
     }
 }
